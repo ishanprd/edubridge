@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+, "src/app/teacher/page.jsx", "src/components/common/CustomAlertDialog.jsx", "src/components/ui/skeleton.jsx", "src/app/offline-content/page.jsx", "src/app/student/my-courses/page.jsx", "src/app/admin/Sidebar.jsx", "src/app/admin/page.jsx", "src/app/admin/live-sessions/page.jsx", "src/app/admin/users/page.jsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

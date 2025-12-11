@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Offline Contents</title>
+<style>
+  :root {
+    --bg1: #f8fafc;
+    --bg2: #eef2ff;
+    --bg3: #ede9fe;
+    --primary: #2563eb;
+    --primary2: #7c3aed;
+    --text: #0f172a;
+    --muted: #475569;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --green: #16a34a;
+    --orange: #ea580c;
+    --blue: #2563eb;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+    min-height: 100vh; color: var(--text);
+  }
+
+  .header {
+    background: linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed);
+    color: #fff;
+  }
+  .container { max-width: 1120px; margin: 0 auto; padding: 1.5rem; }
+
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.75rem 0;
+  }
+  .title { display: flex; align-items: center; gap: .75rem; font-weight: 800; }
+  .title svg { width: 32px; height: 32px; }
+  .subtitle { color: rgba(255,255,255,.85); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .85rem; font-weight: 600; border-radius: 9999px; padding: .25rem .75rem;
+  }
+  .badge.online { background: #16a34a; color: #fff; }
+  .badge.offline { background: #f59e0b; color: #fff; }
+
+  .alert {
+    display: flex; align-items: flex-start; gap: .75rem;
+    padding: .75rem .875rem; border-radius: .75rem;
+    border: 1px solid #fed7aa; background: #fff7ed; color: #9a3412; margin-bottom: 1rem;
+  }
+  .grid {
+    display: grid; gap: 1rem;
+    grid-template-columns: repeat(1, minmax(0,1fr));
+  }
+  @media (min-width: 768px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (min-width: 1024px){ .grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 1rem; transition: box-shadow .2s, transform .2s, border-color .2s;
+  }
+  .card:hover { box-shadow: 0 10px 30px rgba(0,0,0,.08); border-color: #bfdbfe; }
+
+  .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; }
+  .chip { font-size: .7rem; padding: .15rem .5rem; border-radius: .5rem; border: 1px solid var(--border); color: #334155; }
+  .icon-blue { color: var(--blue); }
+
+  .card-title { font-weight: 800; font-size: 1.05rem; margin: .25rem 0 .5rem; }
+  .muted { color: var(--muted); }
+  .what { margin-top: .5rem; }
+  .what h4 { font-size: .75rem; margin: 0 0 .25rem; display: flex; align-items: center; gap: .35rem; color: #334155; }
+  .what ul { list-style: none; padding-left: 0; margin: 0; }
+  .what li { display: flex; align-items: start; gap: .5rem; font-size: .8rem; color: #475569; }
+  .dot { margin-top: .45rem; width: 6px; height: 6px; border-radius: 9999px; background: var(--blue); flex-shrink: 0; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    width: 100%; padding: .55rem .75rem; border-radius: .6rem;
+    background: #fff; color: #1f2937; border: 1px solid var(--border); text-decoration: none; font-weight: 600;
+  }
+  .btn:hover { background: #eff6ff; border-color: #bfdbfe; }
+
+  .footer-note { font-size: .75rem; color: #94a3b8; margin-top: .5rem; }
+
+  .center { display: grid; place-items: center; min-height: 50vh; }
+  .spinner {
+    width: 42px; height: 42px; border-radius: 9999px;
+    border: 3px solid #bfdbfe; border-top-color: var(--blue); animation: spin 1s linear infinite; margin: 0 auto 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty {
+    text-align: center; padding: 3rem 1rem; border: 2px dashed var(--border); border-radius: 1rem; background: #fff;
+  }
+  .empty svg { width: 56px; height: 56px; color: #94a3b8; margin-bottom: .75rem; }
+  .controls { display:flex; gap:.5rem; margin:.75rem 0 0; }
+  .controls .btn-mini { padding: .35rem .6rem; font-size: .8rem; width:auto; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="container header-inner">
+      <div>
+        <div class="title">
+          <!-- Book Icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M4 4v15.5A2.5 2.5 0 0 1 6.5 22H20V6a2 2 0 0 0-2-2H6" />
+          </svg>
+          <div>
+            <div style="font-size:1.6rem; line-height:1">Offline Contents</div>
+            <div class="subtitle">Access your cached course materials</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span id="netBadge" class="badge online">
+          <!-- Wifi icon -->
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+            <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <line x1="12" y1="20" x2="12.01" y2="20" />
+          </svg>
+          Online
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="contentRoot">
+    <!-- offline alert -->
+    <div id="offlineAlert" class="alert" style="display:none">
+      <!-- WifiOff icon -->
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M16.72 5.72A16 16 0 0 1 22.58 9" />
+        <path d="M5 12.55a11 11 0 0 1 7.64-2.05" />
+        <path d="M1.42 9A16 16 0 0 1 5.07 6.1" />
+        <path d="M8.53 16.11A6 6 0 0 1 12 15a6 6 0 0 1 3.47 1.11" />
+        <line x1="2" y1="2" x2="22" y2="22" />
+        <line x1="12" y1="20" x2="12.01" y2="20" />
+      </svg>
+      <div>
+        <div style="font-weight:700">You're Offline</div>
+        <div>Showing cached contents only. Connect to internet for updated materials.</div>
+      </div>
+    </div>
+
+    <!-- controls -->
+    <div class="controls">
+      <button class="btn btn-mini" id="refreshBtn">Refresh list</button>
+      <button class="btn btn-mini" id="purgeBtn" title="Clear duplicates and refetch from caches only">Clear & Reload</button>
+    </div>
+
+    <!-- loader -->
+    <div id="loader" class="center" style="display:none">
+      <div>
+        <div class="spinner"></div>
+        <div class="muted" style="text-align:center">Loading cached contents…</div>
+      </div>
+    </div>
+
+    <!-- list -->
+    <div id="listWrap" style="display:none">
+      <h2 style="font-size:1.35rem; font-weight:800; margin:1rem 0">
+        Available Contents (<span id="count">0</span>)
+      </h2>
+      <div id="grid" class="grid"></div>
+    </div>
+
+    <!-- empty -->
+    <div id="empty" class="empty" style="display:none">
+      <!-- alert circle -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <h3 style="margin:.25rem 0 .35rem; font-weight:800">No Cached Contents</h3>
+      <p class="muted">Visit some courses while online to cache their contents for offline access.</p>
+    </div>
+
+    <div class="footer-note">Tip: PDFs you opened while online are available offline from the same link.</div>
+  </div>
+
+<script>
+(function(){
+  const VERSION = "v8"; // keep in sync with SW
+  const LAST_ONLINE_PATH_KEY = "edubridge:last-online-path";
+  const $ = (id)=>document.getElementById(id);
+  const netBadge = $("netBadge");
+  const offlineAlert = $("offlineAlert");
+  const loader = $("loader");
+  const listWrap = $("listWrap");
+  const empty = $("empty");
+  const grid = $("grid");
+  const countEl = $("count");
+  const refreshBtn = $("refreshBtn");
+  const purgeBtn = $("purgeBtn");
+
+  function setOnlineUI() {
+    const online = navigator.onLine;
+    offlineAlert.style.display = online ? "none" : "flex";
+    netBadge.className = "badge " + (online ? "online" : "offline");
+    netBadge.innerHTML = (online
+      ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0" /><path d="M1.42 9a16 16 0 0 1 21.16 0" /><path d="M8.53 16.11a6 6 0 0 1 6.95 0" /><line x1="12" y1="20" x2="12.01" y2="20" /></svg> Online'
+      : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16.72 5.72A16 16 0 0 1 22.58 9" /><path d="M5 12.55a11 11 0 0 1 7.64-2.05" /><path d="M1.42 9A16 16 0 0 1 5.07 6.1" /><path d="M8.53 16.11A6 6 0 0 1 12 15a6 6 0 0 1 3.47 1.11" /><line x1="2" y1="2" x2="22" y2="22" /><line x1="12" y1="20" x2="12.01" y2="20" /></svg> Offline');
+  }
+
+  function redirectBackOnline() {
+    if (!navigator.onLine) return;
+    try {
+      const target = localStorage.getItem(LAST_ONLINE_PATH_KEY) || "/";
+      window.location.replace(target);
+    } catch (e) {
+      window.location.replace("/");
+    }
+  }
+
+  window.addEventListener("online", () => { setOnlineUI(); redirectBackOnline(); });
+  window.addEventListener("offline", setOnlineUI);
+
+  function show(state){
+    loader.style.display = state==="loading" ? "grid":"none";
+    listWrap.style.display = state==="list" ? "block":"none";
+    empty.style.display = state==="empty" ? "block":"none";
+  }
+
+  function createEl(tag, attrs={}, children=[]) {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([k,v])=>{
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else el.setAttribute(k, v);
+    });
+    (Array.isArray(children) ? children : [children]).forEach(c=>{
+      if (c==null) return;
+      if (typeof c === "string") el.appendChild(document.createTextNode(c));
+      else el.appendChild(c);
+    });
+    return el;
+  }
+
+  async function getCachedContents() {
+    if (!("caches" in window)) return [];
+    const all = [];
+    const names = await caches.keys();
+
+    // only api-* caches (optionally: current user only if you include a hash)
+    const apiCaches = names.filter(n => n.startsWith("api-"));
+
+    for (const name of apiCaches) {
+      const cache = await caches.open(name);
+      const reqs = await cache.keys();
+
+      // only content list endpoints
+      const contentReqs = reqs.filter(r => r.url.includes("/api/contents?courseId="));
+
+      for (const req of contentReqs) {
+        const res = await cache.match(req);
+        if (!res) continue;
+        try {
+          const data = await res.json();
+          if (data && Array.isArray(data.data)) {
+            const url = new URL(req.url);
+            const courseId = url.searchParams.get("courseId");
+            for (const item of data.data) {
+              all.push(Object.assign({}, item, { courseId: item.courseId || courseId }));
+            }
+          }
+        } catch(e) {
+          // ignore bad JSON
+        }
+      }
+    }
+
+    // dedupe by _id
+    const seen = new Set();
+    const uniq = [];
+    for (const it of all) {
+      const id = it && it._id ? it._id : JSON.stringify([it.title, it.courseId]);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      uniq.push(it);
+    }
+    return uniq;
+  }
+
+  function renderList(items) {
+    grid.innerHTML = "";
+    countEl.textContent = String(items.length);
+    if (!items.length) {
+      show("empty");
+      return;
+    }
+
+    for (let i=0;i<items.length;i++) {
+      const content = items[i];
+
+      const head = createEl("div", {class:"card-head"}, [
+        createEl("span",{class:"chip", text:`Module ${content.position || (i+1)}`}),
+        content.pdfUrl ? createEl("span", {class:"icon-blue"}, [
+          // FileText icon
+          createEl("svg", {width:"20",height:"20",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"}, [
+            createEl("path",{d:"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"}),
+            createEl("polyline",{points:"14 2 14 8 20 8"})
+          ])
+        ]) : null
+      ]);
+
+      const title = createEl("div", {class:"card-title"}, content.title || "Untitled");
+
+      const desc = content.description
+        ? createEl("p", {class:"muted"}, content.description)
+        : null;
+
+      let what = null;
+      if (Array.isArray(content.whatToLearn) && content.whatToLearn.length) {
+        const list = createEl("ul");
+        content.whatToLearn.slice(0,3).forEach(txt=>{
+          list.appendChild(createEl("li", {}, [
+            createEl("span",{class:"dot"}), createEl("span",{}, txt)
+          ]));
+        });
+        const more = content.whatToLearn.length > 3
+          ? createEl("div", {class:"muted", style:"font-size:.8rem; padding-left:.95rem"}, `+${content.whatToLearn.length-3} more`)
+          : null;
+
+        what = createEl("div", {class:"what"}, [
+          createEl("h4", {}, [
+            // check-circle
+            createEl("svg",{width:"14",height:"14",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[
+              createEl("path",{d:"M22 11.08V12a10 10 0 1 1-5.93-9.14"}),
+              createEl("polyline",{points:"22 4 12 14.01 9 11.01"})
+            ]),
+            "What you'll learn"
+          ]),
+          list,
+          more
+        ]);
+      }
+
+      const pdfBtn = (content.pdfUrl && content.pdfName)
+        ? createEl("a", {href: content.pdfUrl, target:"_blank", rel:"noopener noreferrer", class:"btn", style:"margin-top:.5rem"}, [
+            // eye icon
+            createEl("svg",{width:"16",height:"16",viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2"},[
+              createEl("path",{d:"M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"}),
+              createEl("circle",{cx:"12",cy:"12",r:"3"})
+            ]),
+            content.pdfName
+          ])
+        : null;
+
+      const added = content.createdAt
+        ? createEl("div", {class:"footer-note"},
+            "Added " + new Date(content.createdAt).toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric"}))
+        : null;
+
+      const card = createEl("div", {class:"card"}, [head, title, desc, what, pdfBtn, added]);
+      grid.appendChild(card);
+    }
+
+    show("list");
+  }
+
+  async function load() {
+    show("loading");
+    try {
+      const items = await getCachedContents();
+      renderList(items);
+    } catch (e) {
+      console.error("Error loading cached contents:", e);
+      renderList([]);
+    }
+  }
+
+  refreshBtn.addEventListener("click", load);
+  purgeBtn.addEventListener("click", async () => {
+    // This button just re-renders from caches; if you want real purge, add logic.
+    await load();
+  });
+
+  // boot
+  setOnlineUI();
+  redirectBackOnline();
+  load();
+})();
+</script>
+</body>
+</html>
